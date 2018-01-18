@@ -1,20 +1,14 @@
 <div class='background'></div>
 <div class='hours-blocks'>
-<div class='hour-block'></div>
-<div class='hour-block'></div>
-<div class='hour-block'></div>
-<div class='hour-block'></div>
-<div class='hour-block'></div>
-<div class='hour-block'></div>
-<div class='hour-block'></div>
-<div class='hour-block'></div>
-<div class='hour-block'></div>
-<div class='hour-block'></div>
-<div class='hour-block'></div>
-<div class='hour-block'></div>
-<div class='hour-block'></div>
-<div class='hour-block'></div>
-<div class='hour-block'></div>
+{{#each time.blocks}}
+<div class='hour-block' hour='{{ hour }}' now='{{ now }}'>
+{{#if now}}
+<div class='current-time'>
+<div class='label'>{{time.now}}</div>
+</div>
+{{/if}}
+</div>
+{{/each}}
 </div>
 <div class='calendar-header'>
 <div class='date'>
@@ -27,54 +21,9 @@
 </div>
 </div>
 <div class='time'>
-<div class='hour' state='disabled'>
-8
-</div>
-<div class='hour' state='disabled'>
-9
-</div>
-<div class='hour' state='disabled'>
-10
-</div>
-<div class='hour' state='disabled'>
-11
-</div>
-<div class='hour'>
-12
-</div>
-<div class='hour'>
-13
-</div>
-<div class='hour'>
-14
-</div>
-<div class='hour'>
-15
-</div>
-<div class='hour'>
-16
-</div>
-<div class='hour'>
-17
-</div>
-<div class='hour'>
-18
-</div>
-<div class='hour'>
-19
-</div>
-<div class='hour'>
-20
-</div>
-<div class='hour'>
-21
-</div>
-<div class='hour'>
-22
-</div>
-<div class='hour'>
-23
-</div>
+{{#each time.hours}}
+<div class='hour' hour_disabled='{{ hour_disabled }}'>{{hour}}</div>
+{{/each}}
 </div>
 </div>
 <table class='calendar'>
@@ -136,13 +85,40 @@
         top: 117px;
 
         .hour-block {
-            border-left: 1px solid rgba(19,100,205,0.10);
             width: 100%;
             height: 100%;
-        }
-
-        .hour-block:last-child {
-            border-right: 1px solid rgba(19,100,205,0.10);
+            
+            &[hour] {
+                border-left: 1px solid rgba(19,100,205,0.10);
+            }
+            
+            &[now] {
+                border-left: 1px solid #007DFF;
+                position: relative;
+                height: calc(100% + 12px);
+                top: -12px;
+            }
+            
+            &:last-child {
+                border-right: 1px solid rgba(19,100,205,0.10);
+            }
+            
+            .current-time {
+                position: absolute;
+                background: #007DFF;
+                border-radius: 100px;
+                padding: 3px 10px 4px 10px;
+                left: -26px;
+                top: calc(-20px);
+                
+                .label {
+                    font-family: HelveticaNeue-Bold;
+                    font-size: 11px;
+                    color: #FFFFFF;
+                    letter-spacing: 0.4px;
+                    width: 29px;
+                }
+            }
         }
     }
 
@@ -195,10 +171,10 @@
                 letter-spacing: 0.4px;
                 width: 14px;
                 text-align: center;
-            }
 
-            .hour[state=disabled] {
-                color: #858E98;
+                &[hour_disabled] {
+                    color: #858E98;
+                }
             }
         }
     }

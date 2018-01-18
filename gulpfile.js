@@ -31,7 +31,6 @@ const _dst_html = './dst_html/';
 const _dst = './dst/';
 
 gulp.task('build-js', function () {
-  console.log(`Server listening?`);
   if (!fs.existsSync(_dst)) {
     fs.mkdir(_dst, function () { });
   }

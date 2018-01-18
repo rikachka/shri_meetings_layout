@@ -19,6 +19,10 @@ var availability3 = [
 function buildMinutesAvailability(meetings) {
     var availability = [];
     var cur_minute = 0;
+    var earlier_today = getTime().cur_shift;
+    for(; cur_minute < earlier_today; cur_minute++) {
+        availability.push({minute: cur_minute, occupied: true});
+    }
     meetings.forEach((meeting) => {
         for(; cur_minute < meeting.start; cur_minute++) {
             availability.push({minute: cur_minute});
@@ -28,7 +32,7 @@ function buildMinutesAvailability(meetings) {
         }
     });
     for(; cur_minute < 180; cur_minute++) {
-        availability.push({start: cur_minute, end: cur_minute});
+        availability.push({minute: cur_minute});
     }
     return availability;
 };
@@ -48,6 +52,47 @@ var rooms6 = [
     {name: 'Белорусский ликер', capacity: 6, state: 'disabled', availability: buildMinutesAvailability(availability3), },
 ];
 
+function buildMinutesBlocks(now_block) {
+    var blocks = [];
+    var cur_minute = 0;
+    for(; cur_minute < 180; cur_minute++) {
+        if (cur_minute == now_block) {
+            blocks.push({minute: cur_minute, now: true});
+        } else if (cur_minute % 12 == 0) {
+            blocks.push({minute: cur_minute, hour: true});
+        } else {
+            blocks.push({minute: cur_minute})
+        }
+    }
+    return blocks;
+};
+
+function determineHoursState(now_hour) {
+    var hours = []
+    for(let hour = 8; hour < 24; hour++) {
+        if (hour <= now_hour) {
+            hours.push({hour: hour, hour_disabled: true});
+        } else {
+            hours.push({hour: hour});
+        }
+    }
+    return hours;
+}
+
+function getTime() {
+    let hour = new Date().getHours() + 12;
+    let minutes = new Date().getMinutes();
+    let shift = Math.floor((hour * 60 + minutes - 8 * 60) / 5);
+    return {
+        now: hour.toString() + ':' + minutes.toString(), 
+        cur_hour: hour,
+        cur_minutes: minutes,
+        cur_shift: shift,
+        blocks: buildMinutesBlocks(shift),
+        hours: determineHoursState(hour),
+    };
+}
+
 export default Ractive.extend({
     template: template.template,
     css: template.css,
@@ -57,4 +102,7 @@ export default Ractive.extend({
             {number: 6, rooms: rooms6},
         ],
     },
+    computed: {
+        time: getTime,
+    }
 });

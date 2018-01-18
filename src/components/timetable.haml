@@ -1,0 +1,231 @@
+.background
+.hours-blocks
+    - (8...23).each do |hour| 
+        .hour-block 
+
+.calendar-header
+    .date
+        .arrow
+            %img{src: '../images/arrow2.svg'}
+        .date-name 14 дек · Сегодня
+        .arrow
+            %img{src: '../images/arrow.svg'}
+    .time
+        - (8...12).each do |hour|
+            .hour{state: 'disabled'}  
+                = hour
+        - (12...24).each do |hour|
+            .hour 
+                = hour
+%table.calendar
+    {{#each floors}}
+    %tr
+        %td
+            .calendar-floor
+                .floor-number {{number}} ЭТАЖ
+        %td
+        
+    {{#each rooms}}    
+    %tr
+        %td
+            .calendar-rooms{state: '{{ state }}'}
+                .room-name {{name}}
+                .room-capacity до {{capacity}} человек
+        %td
+            .room-availability  
+                .minutes-morning
+                .minutes-day
+                    {{#each availability}}
+                    .minute{occupied: '{{ occupied }}'} 
+                    {{/each}}
+                .minutes-night
+    {{/each}}
+    {{/each}}
+    
+
+
+
+:plain
+    <style type='text/sass'>
+        body {
+            margin: 0; 
+        }
+
+        .background {
+            position: absolute;
+            z-index: -1;
+            width: calc(100% - 245px);
+            height: calc(100% - 117px);
+            left: 245px;
+            top: 117px;
+            background: #F6F7F9;
+            box-shadow: -1px 0 0 0 #E9ECEF;
+        }
+
+        .hours-blocks {
+            position: absolute; 
+            z-index: 10;
+            display: flex;
+            width: calc(100% - 245px - 31px - 13px);
+            height: calc(100% - 117px);
+            left: calc(245px + 31px);
+            top: 117px;
+
+            .hour-block {
+                border-left: 1px solid rgba(19,100,205,0.10);
+                width: 100%;
+                height: 100%;
+            }
+
+            .hour-block:last-child {
+                border-right: 1px solid rgba(19,100,205,0.10);
+            }
+        }
+
+        .calendar-header {
+            background: #FFFFFF;
+            box-shadow: 0 -1px 0 0 #E9ECEF;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 0px 11px 24px;
+
+            .date {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: calc(220px - 24px);
+                padding: 0 24px 0 0;
+
+                .arrow {
+                    background: #E9ECEF;
+                    border-radius: 100px; 
+                    padding: 7px;
+                    
+                    img {
+                        height: 10px;
+                        width: 10px;
+                        display: block;
+                    }
+                }
+
+                .date-name {
+                    font-family: HelveticaNeue-Medium;
+                    font-size: 15px;
+                    color: #000000;
+                    letter-spacing: 0;
+                }
+            }
+
+            .time {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: calc(100% - 220px - (31px - 7px) - (13px - 7px));
+                padding: 0 calc(13px - 7px) 0 calc(31px - 7px);
+
+                .hour {
+                    font-family: HelveticaNeue-Bold;
+                    font-size: 11px;
+                    color: #252525;
+                    letter-spacing: 0.4px;
+                    width: 14px;
+                    text-align: center;
+                }
+
+                .hour[state=disabled] {
+                    color: #858E98;
+                }
+            }
+        }
+
+        .calendar {
+            padding: 0 0 0 25px;
+            width: 100%;
+            border-spacing: 0px;
+            box-shadow: 0 -1px 0 0 #E9ECEF;
+
+            .calendar-floor {
+                padding: 20px 0 0 0;
+
+                .floor-number {
+                    font-family: HelveticaNeue-Bold;
+                    font-size: 11px;
+                    color: #858E98;
+                    letter-spacing: 0.4px;
+                }
+            }
+
+            td {
+                padding: 0;
+            }
+
+            td:first-child {
+                width: 220px;
+            }
+
+            .calendar-rooms {
+                padding: 4px 0;
+
+                .room-name {
+                    padding: 4px 0 1px 0;
+                    font-family: HelveticaNeue-Medium;
+                    font-size: 15px;
+                    line-height: 17px;
+                }
+
+                .room-capacity {
+                    padding: 1px 0 4px 0;
+                    font-family: HelveticaNeue;
+                    font-size: 13px;
+                    line-height: 17px;
+                }
+                
+                &[state=disabled] > * {
+                    color: #858E98;
+                } 
+
+                &[state=hover] > .room-name {
+                    color: #0070E0;
+                    font-family: HelveticaNeue-Bold;
+                }
+
+                &[state=active] > .room-name {
+                    color: #1D54FE;
+                    font-family: HelveticaNeue-Bold;
+                }
+            }
+            
+            .room-availability {
+                display: flex;
+                width: 100% ;
+                
+                .minutes-day {
+                    display: flex;
+                    width: calc(100% - 31px - 13px);
+                    
+                    .minute {
+                        background: #FFFFFF;
+                        width: 100% ;
+                        height: 28px;
+
+                        &[occupied] {
+                            background: #D5DFE9;
+                        }
+                    }
+                }
+                
+                .minutes-morning {
+                    background: #D5DFE9;
+                    height: 28px;
+                    width: 31px;
+                }
+
+                .minutes-night {
+                    background: #D5DFE9;
+                    height: 28px;
+                    width: 13px;
+                }
+            }
+        }
+    </style>

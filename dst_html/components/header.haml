@@ -1,0 +1,51 @@
+<div class='header'>
+<div class='logo'>
+<img src='./images/logo.svg'>
+</div>
+<button class='create-meeting'>
+<div class='label'>Создать встречу</div>
+</button>
+</div>
+<style type='text/sass'>   
+    .header {
+        background: #FFFFFF;
+        box-shadow: 0 -1px 0 0 #E9ECEF;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 18px 24px 17px 24px;
+
+        .logo, .logo img {
+            height: 24.4px;
+        }
+        
+        .create-meeting {
+            background: #007DFF;
+            border-radius: 4px;
+            padding: 10px 16px;
+            text-align: center;
+            border: 0;
+
+            .label {
+                font-family: HelveticaNeue-Medium;
+                font-size: 13px;
+                color: #FFFFFF;
+                letter-spacing: 0;
+                margin: auto;
+            }
+
+            &:hover {
+                background: #0059FF;
+            }
+
+            &:active {
+                background: #0059FF;
+                background: rgba(11,0,255,0.80);
+            }
+
+            &:disabled {
+                background: #E9ECEF;
+            }
+        }
+    }
+</style>

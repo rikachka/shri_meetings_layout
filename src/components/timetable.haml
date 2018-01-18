@@ -15,7 +15,7 @@
         .date-name 14 дек · Сегодня
         .arrow
             %img{src: '../images/arrow.svg'}
-    .time
+    #qqqq.time
         {{#each time.hours}}
         .hour{hour_disabled: '{{ hour_disabled }}'} {{hour}}
         {{/each}}
@@ -38,7 +38,7 @@
                 .minutes-morning
                 .minutes-day
                     {{#each availability}}
-                    .minute{occupied: '{{ occupied }}'} 
+                    .minute{occupied: '{{ occupied }}', meeting: '{{ meeting_id }}'} 
                     {{/each}}
                 .minutes-night
     {{/each}}
@@ -72,6 +72,7 @@
             height: calc(100% - 117px);
             left: calc(245px + 31px);
             top: 117px;
+            pointer-events: none;
 
             .hour-block {
                 width: 100%;
@@ -241,6 +242,14 @@
                         &[occupied] {
                             background: #D5DFE9;
                         }
+                        
+                        & + .hover {
+                            background: #98A9B9;
+                        }
+                        
+                        & + .clicked {
+                            background: #8494A2;
+                        }
                     }
                 }
                 
@@ -253,7 +262,7 @@
                 .minutes-night {
                     background: #D5DFE9;
                     height: 28px;
-                    width: 13px;
+                    width: 14px;
                 }
             }
         }

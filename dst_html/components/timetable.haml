@@ -20,7 +20,7 @@
 <img src='../images/arrow.svg'>
 </div>
 </div>
-<div class='time'>
+<div class='time' id='qqqq'>
 {{#each time.hours}}
 <div class='hour' hour_disabled='{{ hour_disabled }}'>{{hour}}</div>
 {{/each}}
@@ -49,7 +49,7 @@
 <div class='minutes-morning'></div>
 <div class='minutes-day'>
 {{#each availability}}
-<div class='minute' occupied='{{ occupied }}'></div>
+<div class='minute' meeting='{{ meeting_id }}' occupied='{{ occupied }}'></div>
 {{/each}}
 </div>
 <div class='minutes-night'></div>
@@ -83,6 +83,7 @@
         height: calc(100% - 117px);
         left: calc(245px + 31px);
         top: 117px;
+        pointer-events: none;
 
         .hour-block {
             width: 100%;
@@ -252,6 +253,14 @@
                     &[occupied] {
                         background: #D5DFE9;
                     }
+                    
+                    & + .hover {
+                        background: #98A9B9;
+                    }
+                    
+                    & + .clicked {
+                        background: #8494A2;
+                    }
                 }
             }
             
@@ -264,7 +273,7 @@
             .minutes-night {
                 background: #D5DFE9;
                 height: 28px;
-                width: 13px;
+                width: 14px;
             }
         }
     }

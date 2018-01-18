@@ -104,5 +104,20 @@ export default Ractive.extend({
     },
     computed: {
         time: getTime,
+    },
+    oncomplete: function() {
+    	$('.minute').click((item) => {
+            $('.minute').removeClass('clicked');
+            let meeting_id = item.target.attributes.meeting.value;
+            $('.minute[meeting="' + meeting_id + '"]').addClass('clicked');
+    	});
+        
+    	$('.minute').hover((item) => {
+            $('.minute').removeClass('hover');
+            let meeting_id = item.target.attributes.meeting.value;
+            $('.minute[meeting="' + meeting_id + '"]').addClass('hover');
+    	}, () => {
+            $('.minute').removeClass('hover');
+        });
     }
 });

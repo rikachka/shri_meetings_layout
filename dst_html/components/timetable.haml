@@ -39,7 +39,7 @@
 {{#each rooms}}
 <tr>
 <td>
-<div class='calendar-rooms' state='{{ state }}'>
+<div class='calendar-rooms' room='{{ room_id }}' room_disabled='{{ room_disabled }}'>
 <div class='room-name'>{{name}}</div>
 <div class='room-capacity'>до {{capacity}} человек</div>
 </div>
@@ -49,7 +49,7 @@
 <div class='minutes-morning'></div>
 <div class='minutes-day'>
 {{#each availability}}
-<div class='minute' meeting='{{ meeting_id }}' occupied='{{ occupied }}'></div>
+<div class='minute' meeting='{{ meeting_id }}' occupied='{{ occupied }}' room='{{ room_id }}'></div>
 {{/each}}
 </div>
 <div class='minutes-night'></div>
@@ -213,6 +213,16 @@
                 font-family: HelveticaNeue-Medium;
                 font-size: 15px;
                 line-height: 17px;
+                
+                &[room_hover] {
+                    color: #0070E0;
+                    font-family: HelveticaNeue-Bold;
+                }
+                
+                &[room_clicked] {
+                    color: #1D54FE;
+                    font-family: HelveticaNeue-Bold;
+                }
             }
 
             .room-capacity {
@@ -222,19 +232,13 @@
                 line-height: 17px;
             }
             
-            &[state=disabled] > * {
-                color: #858E98;
+            &[room_disabled] > * {
+                color: #858E98 !important;
+                
+                &.room-name {
+                    font-family: HelveticaNeue-Medium !important;
+                }
             } 
-
-            &[state=hover] > .room-name {
-                color: #0070E0;
-                font-family: HelveticaNeue-Bold;
-            }
-
-            &[state=active] > .room-name {
-                color: #1D54FE;
-                font-family: HelveticaNeue-Bold;
-            }
         }
         
         .room-availability {
@@ -254,11 +258,11 @@
                         background: #D5DFE9;
                     }
                     
-                    & + .hover {
+                    &[meeting_hover] {
                         background: #98A9B9;
                     }
                     
-                    & + .clicked {
+                    &[meeting_clicked] {
                         background: #8494A2;
                     }
                 }

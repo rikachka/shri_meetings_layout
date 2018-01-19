@@ -1,5 +1,6 @@
 import Ractive from 'ractive';
 var template = require('./timetable.haml');
+var dateFormat = require('dateformat');
 
 var availability1 = [
     {start: 12, end: 30, meeting_id: 2},
@@ -38,18 +39,18 @@ function buildMinutesAvailability(meetings) {
 };
 
 var rooms7 = [
-    {name: 'Ржавый Фред', capacity: 6, state: 'disabled', availability: buildMinutesAvailability(availability3), },
-    {name: 'Прачечная', capacity: 10, availability: buildMinutesAvailability(availability1), },
-    {name: 'Желтый дом', capacity: 10, state: 'hover', availability: buildMinutesAvailability(availability2), },
-    {name: 'Оранжевый тюльпан', capacity: 6, state: 'disabled', availability: buildMinutesAvailability(availability3), },
+    {name: 'Ржавый Фред', capacity: 6, room_id: 1, room_disabled: 'true', availability: buildMinutesAvailability(availability3), },
+    {name: 'Прачечная', capacity: 10, room_id: 2, availability: buildMinutesAvailability(availability1), },
+    {name: 'Желтый дом', capacity: 10, room_id: 3, availability: buildMinutesAvailability(availability2), },
+    {name: 'Оранжевый тюльпан', capacity: 6, room_id: 4, room_disabled: 'true', availability: buildMinutesAvailability(availability3), },
 ];
 
 var rooms6 = [
-    {name: 'Джокер', capacity: 6, state: 'disabled', availability: buildMinutesAvailability(availability3), },
-    {name: 'Мариванна', capacity: 10, state: 'active', availability: buildMinutesAvailability(availability2), },
-    {name: 'Тонкий Боб', capacity: 10, availability: buildMinutesAvailability(availability1), },
-    {name: 'Черная вдова', capacity: 6, state: 'disabled', availability: buildMinutesAvailability(availability3), },
-    {name: 'Белорусский ликер', capacity: 6, state: 'disabled', availability: buildMinutesAvailability(availability3), },
+    {name: 'Джокер', capacity: 6, room_id: 5, room_disabled: 'true', availability: buildMinutesAvailability(availability3), },
+    {name: 'Мариванна', capacity: 10, room_id: 6, availability: buildMinutesAvailability(availability2), },
+    {name: 'Тонкий Боб', capacity: 10, room_id: 7, availability: buildMinutesAvailability(availability1), },
+    {name: 'Черная вдова', capacity: 6, room_id: 8, room_disabled: 'true', availability: buildMinutesAvailability(availability3), },
+    {name: 'Белорусский ликер', capacity: 6, room_id: 9, room_disabled: 'true', availability: buildMinutesAvailability(availability3), },
 ];
 
 function buildMinutesBlocks(now_block) {
@@ -80,11 +81,14 @@ function determineHoursState(now_hour) {
 }
 
 function getTime() {
-    let hour = new Date().getHours() + 12;
-    let minutes = new Date().getMinutes();
+    let date = new Date();
+    date.setHours(date.getHours() + 12);
+    let hour = date.getHours();
+    let minutes = date.getMinutes();
     let shift = Math.floor((hour * 60 + minutes - 8 * 60) / 5);
+    let time = dateFormat(date, 'HH:MM');
     return {
-        now: hour.toString() + ':' + minutes.toString(), 
+        now: time, 
         cur_hour: hour,
         cur_minutes: minutes,
         cur_shift: shift,
@@ -107,17 +111,26 @@ export default Ractive.extend({
     },
     oncomplete: function() {
     	$('.minute').click((item) => {
-            $('.minute').removeClass('clicked');
-            let meeting_id = item.target.attributes.meeting.value;
-            $('.minute[meeting="' + meeting_id + '"]').addClass('clicked');
+            if (item.target.attributes.meeting) {
+                let meeting_id = item.target.attributes.meeting.value;
+                $('.minute[meeting!="' + meeting_id + '"]').removeAttr('meeting_clicked');
+                $('.minute[meeting="' + meeting_id + '"]').attr('meeting_clicked', true);
+                let room_id = item.target.attributes.room.value;
+                $('.calendar-rooms[room!="' + room_id + '"]').children('.room-name').removeAttr('room_clicked');
+                $('.calendar-rooms[room="' + room_id + '"]').children('.room-name').attr('room_clicked', 'true');
+            }
     	});
         
     	$('.minute').hover((item) => {
-            $('.minute').removeClass('hover');
-            let meeting_id = item.target.attributes.meeting.value;
-            $('.minute[meeting="' + meeting_id + '"]').addClass('hover');
+            if (item.target.attributes.meeting) {
+                let meeting_id = item.target.attributes.meeting.value;
+                $('.minute[meeting="' + meeting_id + '"]').attr('meeting_hover', true);
+                let room_id = item.target.attributes.room.value;
+                $('.calendar-rooms[room="' + room_id + '"]').children('.room-name').attr('room_hover', 'true');
+            }
     	}, () => {
-            $('.minute').removeClass('hover');
+            $('.minute').removeAttr('meeting_hover');
+            $('.calendar-rooms').children('.room-name').removeAttr('room_hover');
         });
     }
 });

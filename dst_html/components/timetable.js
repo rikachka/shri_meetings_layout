@@ -17,27 +17,6 @@ var availability3 = [
     {start: 0, end: 180, meeting_id: 6},
 ];
 
-function buildMinutesAvailability(meetings) {
-    var availability = [];
-    var cur_minute = 0;
-    var earlier_today = getTime().cur_shift;
-    for(; cur_minute < earlier_today; cur_minute++) {
-        availability.push({minute: cur_minute, occupied: true});
-    }
-    meetings.forEach((meeting) => {
-        for(; cur_minute < meeting.start; cur_minute++) {
-            availability.push({minute: cur_minute});
-        }
-        for(; cur_minute < meeting.end; cur_minute++) {
-            availability.push({minute: cur_minute, meeting_id: meeting.meeting_id, occupied: true});
-        }
-    });
-    for(; cur_minute < 180; cur_minute++) {
-        availability.push({minute: cur_minute});
-    }
-    return availability;
-};
-
 var rooms7 = [
     {name: 'Ржавый Фред', capacity: 6, room_id: 1, room_disabled: 'true', availability: buildMinutesAvailability(availability3), },
     {name: 'Прачечная', capacity: 10, room_id: 2, availability: buildMinutesAvailability(availability1), },
@@ -52,6 +31,28 @@ var rooms6 = [
     {name: 'Черная вдова', capacity: 6, room_id: 8, room_disabled: 'true', availability: buildMinutesAvailability(availability3), },
     {name: 'Белорусский ликер', capacity: 6, room_id: 9, room_disabled: 'true', availability: buildMinutesAvailability(availability3), },
 ];
+
+function buildMinutesAvailability(meetings) {
+    var availability = [];
+    var cur_minute = 0;
+    var earlier_today = getTime().cur_shift;
+    meetings.forEach((meeting) => {
+        for(; cur_minute < meeting.start; cur_minute++) {
+            if (cur_minute < earlier_today) {
+                availability.push({minute: cur_minute, occupied: true});
+            } else {
+                availability.push({minute: cur_minute});
+            }
+        }
+        for(; cur_minute < meeting.end; cur_minute++) {
+            availability.push({minute: cur_minute, meeting_id: meeting.meeting_id, occupied: true});
+        }
+    });
+    for(; cur_minute < 180; cur_minute++) {
+        availability.push({minute: cur_minute});
+    }
+    return availability;
+};
 
 function buildMinutesBlocks(now_block) {
     var blocks = [];
@@ -100,11 +101,13 @@ function getTime() {
 export default Ractive.extend({
     template: template.template,
     css: template.css,
-    data: {
-        floors: [
-            {number: 7, rooms: rooms7},
-            {number: 6, rooms: rooms6},
-        ],
+    data: function() {
+        return {
+            floors: [
+                {number: 7, rooms: rooms7},
+                {number: 6, rooms: rooms6},
+            ],
+        }
     },
     computed: {
         time: getTime,

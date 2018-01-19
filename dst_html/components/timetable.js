@@ -1,6 +1,7 @@
 import Ractive from 'ractive';
 var template = require('./timetable.haml');
 var dateFormat = require('dateformat');
+import ComponentMeetingPopup from '../components/meeting_popup.js';
 
 var availability1 = [
     {start: 12, end: 30, meeting_id: 2},
@@ -83,7 +84,7 @@ function determineHoursState(now_hour) {
 
 function getTime() {
     let date = new Date();
-    date.setHours(date.getHours() + 12);
+    date.setHours(date.getHours() - 10);
     let hour = date.getHours();
     let minutes = date.getMinutes();
     let shift = Math.floor((hour * 60 + minutes - 8 * 60) / 5);
@@ -101,6 +102,9 @@ function getTime() {
 export default Ractive.extend({
     template: template.template,
     css: template.css,
+    components: {
+        ComponentMeetingPopup: ComponentMeetingPopup
+    },
     data: function() {
         return {
             floors: [

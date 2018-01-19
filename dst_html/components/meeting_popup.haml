@@ -1,0 +1,123 @@
+<div class='popup'>
+<div class='triangle'></div>
+<div class='box'>
+<div class='title'>
+<div class='label'>
+Рассуждения о высоком
+</div>
+<button class='edit'>
+<img src='../images/edit.svg'>
+</button>
+</div>
+<div class='description'>
+14 декабря, 15:00—17:00  ·  Жёлтый дом
+</div>
+<div class='participants'>
+<div class='icon'>
+<img src='../images/avatar2.jpg'>
+</div>
+<div class='info'>
+<span class='name'>Дарт Вейдер</span>
+<span class='number'>и 12 участников</span>
+</div>
+</div>
+</div>
+</div>
+<style type='text/sass'>  
+    .popup {
+        position: absolute;
+        
+        .triangle {
+            position: relative;
+            left: calc(338px / 2 - 8px / 2);
+            width: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 8px solid #FFFFFF;
+        }
+
+        .box {
+            width: calc(338px - 24px);
+            background: #FFFFFF;
+            box-shadow: 0 1px 16px 0 rgba(0,44,92,0.28);
+            border-radius: 8px;
+            padding: 8px 8px 16px 16px;
+
+            .title {
+                display: flex;
+                justify-content: space-between;
+                align-items: top;
+
+                .label {
+                    font-family: HelveticaNeue-Bold;
+                    font-size: 15px;
+                    color: #000000;
+                    letter-spacing: 0;
+                    line-height: 24px;
+                    padding: 6px 0px 2px 0px;
+                }
+
+                .edit {
+                    background: #E9ECEF;
+                    border-radius: 100px; 
+                    height: 24px;
+                    padding: 7px;
+                    border: 0;
+
+                    img {
+                        height: 10px;
+                        width: 10px;
+                        display: block;
+                        opacity: 0.43;
+                    }
+                    
+                    &:hover img {
+                        opacity: 1;
+                    }
+                }
+            }
+
+            .description {
+                font-family: HelveticaNeue;
+                font-size: 13px;
+                color: #000000;
+                letter-spacing: 0;
+                line-height: 17px;
+            }
+
+            .participants {
+                padding: 16px 0 0 0;
+                display: flex;
+                align-items: center;
+
+                .icon {
+                    padding: 0 8px 0 0;
+                    height: 24px;
+
+                    img {
+                        height: 24px;
+                        width: 24px;
+                        border-radius: 12px;
+                    }
+                }
+
+                .info {
+                    & > * {
+                        font-family: Helvetica;
+                        font-size: 13px;
+                        letter-spacing: 0;
+                        line-height: 17px;
+                    }
+
+                    .name {
+                        color: #000000;
+                    }
+
+                    .number {
+                        color: #858E98;
+                    }
+                }
+            }
+        }
+    }
+</style>

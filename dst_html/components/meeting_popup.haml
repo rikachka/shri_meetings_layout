@@ -3,22 +3,22 @@
 <div class='box'>
 <div class='title'>
 <div class='label'>
-Рассуждения о высоком
+{{meeting.title}}
 </div>
 <button class='edit'>
 <img src='../images/edit.svg'>
 </button>
 </div>
 <div class='description'>
-14 декабря, 15:00—17:00  ·  Жёлтый дом
+{{meeting.date}}  ·  {{name}}
 </div>
 <div class='participants'>
 <div class='icon'>
 <img src='../images/avatar2.jpg'>
 </div>
 <div class='info'>
-<span class='name'>Дарт Вейдер</span>
-<span class='number'>и 12 участников</span>
+<span class='name'>{{meeting.participant_example}}</span>
+<span class='number'>и {{meeting.participants_number}} участников</span>
 </div>
 </div>
 </div>
@@ -26,6 +26,9 @@
 <style type='text/sass'>  
     .popup {
         position: absolute;
+        z-index: 2;
+        left: calc(50% - 338px / 2);
+        top: 50% ;
         
         .triangle {
             position: relative;

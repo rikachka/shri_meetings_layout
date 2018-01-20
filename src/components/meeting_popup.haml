@@ -3,22 +3,25 @@
     .box
         .title
             .label
-                Рассуждения о высоком
+                {{meeting.title}}
             %button.edit
                 %img{src: '../images/edit.svg'}
         .description
-            14 декабря, 15:00—17:00  ·  Жёлтый дом
+            {{meeting.date}}  ·  {{name}}
         .participants
             .icon
                 %img{src: '../images/avatar2.jpg'}
             .info 
-                %span.name Дарт Вейдер
-                %span.number и 12 участников
+                %span.name {{meeting.participant_example}}
+                %span.number и {{meeting.participants_number}} участников
    
 :plain
     <style type='text/sass'>  
         .popup {
             position: absolute;
+            z-index: 2;
+            left: calc(50% - 338px / 2);
+            top: 50% ;
             
             .triangle {
                 position: relative;

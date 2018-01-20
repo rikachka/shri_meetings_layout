@@ -1,4 +1,3 @@
-<ComponentMeetingPopup></ComponentMeetingPopup>
 <div class='background'></div>
 <div class='hours-blocks'>
 {{#each time.blocks}}
@@ -37,7 +36,7 @@
 </td>
 <td></td>
 </tr>
-{{#each rooms}}
+{{#each rooms: room}}
 <tr>
 <td>
 <div class='calendar-rooms' room='{{ room_id }}' room_disabled='{{ room_disabled }}'>
@@ -50,7 +49,11 @@
 <div class='minutes-morning'></div>
 <div class='minutes-day'>
 {{#each availability}}
-<div class='minute' meeting='{{ meeting_id }}' occupied='{{ occupied }}' room='{{ room_id }}'></div>
+<div class='meeting' meeting='{{ meeting_id }}' occupied='{{ occupied }}' room='{{ room_id }}' style='width: {{ length }}%'>
+{{#if meeting_id == meeting_selected}}
+<ComponentMeetingPopup  meeting='{{ meeting }}'></ComponentMeetingPopup>
+{{/if}}
+</div>
 {{/each}}
 </div>
 <div class='minutes-night'></div>
@@ -250,10 +253,10 @@
                 display: flex;
                 width: calc(100% - 31px - 13px);
                 
-                .minute {
+                .meeting {
                     background: #FFFFFF;
-                    width: 100% ;
                     height: 28px;
+                    position: relative;
 
                     &[occupied] {
                         background: #D5DFE9;

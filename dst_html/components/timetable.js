@@ -3,6 +3,20 @@ var template = require('./timetable.haml');
 var dateFormat = require('dateformat');
 import ComponentMeetingPopup from '../components/meeting_popup.js';
 
+dateFormat.i18n = {
+    dayNames: [
+        'вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб',
+        'воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'
+    ],
+    monthNames: [
+        'янв', 'февр', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек',
+        'января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+    ],
+    timeNames: [
+        'a', 'p', 'am', 'pm', 'A', 'P', 'AM', 'PM'
+    ]
+};
+
 var day_begin = 8 * 60;
 var day_end = 23 * 60;
 var day_length = day_end - day_begin;
@@ -12,16 +26,26 @@ var meeting_selected = 0;
 var floors_number = 8;
 
 var meetings = [ 
-    {meeting_id: 6, title: 'Собрание 6', start: 0 * 5 + day_begin, end: day_end, date: '14 декабря, 15:00—17:00', participant: 'Дарт Вейдер', number: 12, room_id: 1},
-    {meeting_id: 2, title: 'Собрание 2', start: 12 * 5 + day_begin, end: 30 * 5 + day_begin, date: '14 декабря, 15:00—17:00', participant: 'Дарт Вейдер', number: 12, room_id: 2},
-    {meeting_id: 4, title: 'Собрание 4', start: 90 * 5 + day_begin, end: day_end, date: '14 декабря, 15:00—17:00', participant: 'Дарт Вейдер', number: 12, room_id: 2},
-    {meeting_id: 3, title: 'Собрание 3', start: 70 * 5 + day_begin, end: 90 * 5 + day_begin, date: '14 декабря, 15:00—17:00', participant: 'Дарт Вейдер', number: 12, room_id: 3},
-    {meeting_id: 1, title: 'Собрание 1', start: 0 * 5 + day_begin, end: 50 * 5 + day_begin, date: '14 декабря, 15:00—17:00', participant: 'Дарт Вейдер', number: 12, room_id: 3},
-    {meeting_id: 5, title: 'Собрание 5', start: 120 * 5 + day_begin, end: 168 * 5 + day_begin, date: '14 декабря, 15:00—17:00', participant: 'Дарт Вейдер', number: 12, room_id: 3},
-    {meeting_id: 7, title: 'Собрание 7', start: 0 * 5 + day_begin, end: day_end, date: '14 декабря, 15:00—17:00', participant: 'Дарт Вейдер', number: 12, room_id: 4},
-    {meeting_id: 8, title: 'Собрание 8', start: 0 * 5 + day_begin, end: day_end, date: '14 декабря, 15:00—17:00', participant: 'Дарт Вейдер', number: 12, room_id: 5},
-    {meeting_id: 9, title: 'Собрание 9', start: 0 * 5 + day_begin, end: day_end, date: '14 декабря, 15:00—17:00', participant: 'Дарт Вейдер', number: 12, room_id: 8},
-    {meeting_id: 10, title: 'Собрание 10', start: 0 * 5 + day_begin, end: day_end, date: '14 декабря, 15:00—17:00', participant: 'Дарт Вейдер', number: 12, room_id: 9},
+    {   meeting_id: 1, title: 'Собрание 1', participant: 'Дарт Вейдер', number: 12, room_id: 1, 
+        start_date: new Date("14 December 2017 8:00"), end_date: new Date("14 December 2017 23:00")    },
+    {   meeting_id: 2, title: 'Собрание 2', participant: 'Дарт Вейдер', number: 12, room_id: 2, 
+        start_date: new Date("14 December 2017 9:00"), end_date: new Date("14 December 2017 11:30")    },
+    {   meeting_id: 3, title: 'Собрание 3', participant: 'Дарт Вейдер', number: 12, room_id: 2, 
+        start_date: new Date("14 December 2017 15:30"), end_date: new Date("14 December 2017 23:00")    },
+    {   meeting_id: 4, title: 'Собрание 4', participant: 'Дарт Вейдер', number: 12, room_id: 3, 
+        start_date: new Date("14 December 2017 13:00"), end_date: new Date("14 December 2017 15:30")    },
+    {   meeting_id: 5, title: 'Собрание 5', participant: 'Дарт Вейдер', number: 12, room_id: 3, 
+        start_date: new Date("14 December 2017 8:00"), end_date: new Date("14 December 2017 11:00")    },
+    {   meeting_id: 6, title: 'Собрание 6', participant: 'Дарт Вейдер', number: 12, room_id: 3, 
+        start_date: new Date("14 December 2017 18:00"), end_date: new Date("14 December 2017 20:00")    },
+    {   meeting_id: 7, title: 'Собрание 7', participant: 'Дарт Вейдер', number: 12, room_id: 4, 
+        start_date: new Date("14 December 2017 8:00"), end_date: new Date("14 December 2017 23:00")    },
+    {   meeting_id: 8, title: 'Собрание 8', participant: 'Дарт Вейдер', number: 12, room_id: 5, 
+        start_date: new Date("14 December 2017 8:00"), end_date: new Date("14 December 2017 23:00")    },
+    {   meeting_id: 9, title: 'Собрание 9', participant: 'Дарт Вейдер', number: 12, room_id: 8, 
+        start_date: new Date("14 December 2017 8:00"), end_date: new Date("14 December 2017 23:00")    },
+    {   meeting_id: 10, title: 'Собрание 10', participant: 'Дарт Вейдер', number: 12, room_id: 9, 
+        start_date: new Date("14 December 2017 8:00"), end_date: new Date("14 December 2017 23:00")    },
 ];
 
 var rooms = [
@@ -38,30 +62,33 @@ var rooms = [
 
 function buildMinutesAvailability(meetings) {
     meetings = meetings.sort(function(meeting1, meeting2) {
-        return meeting1.start - meeting2.start;
+        return meeting1.start_date - meeting2.start_date;
     });
     var availability = [];
     var cur_minute = day_begin;
     var earlier_today = getTime().cur_shift;
     meetings.forEach((meeting) => {
-        while (cur_minute < meeting.start) {
+        var meeting_start = meeting.start_date.getHours() * 60 + meeting.start_date.getMinutes();
+        console.log(meeting_start);
+        var meeting_end = meeting.end_date.getHours() * 60 + meeting.end_date.getMinutes();
+        while (cur_minute < meeting_start) {
             if (cur_minute < earlier_today) {
-                let block_end = Math.min(meeting.start, earlier_today);
-                availability.push({start: cur_minute, length: (block_end - cur_minute) * 100 / day_length, occupied: true, meeting: meeting});
+                let block_end = Math.min(meeting_start, earlier_today);
+                availability.push({length: (block_end - cur_minute) * 100 / day_length, occupied: true, meeting: meeting});
                 cur_minute = block_end;
             } else {
-                availability.push({start: cur_minute, length: (meeting.start - cur_minute) * 100 / day_length});
-                cur_minute = meeting.start;
+                availability.push({length: (meeting_start - cur_minute) * 100 / day_length});
+                cur_minute = meeting_start;
             }
         }
-        availability.push({start: cur_minute, length: (meeting.end - meeting.start) * 100 / day_length, meeting_id: meeting.meeting_id, occupied: true, meeting: meeting});
-        cur_minute = meeting.end;
+        availability.push({length: (meeting_end - meeting_start) * 100 / day_length, meeting_id: meeting.meeting_id, occupied: true, meeting: meeting});
+        cur_minute = meeting_end;
     });
     if (cur_minute < earlier_today) {       
-        availability.push({start: cur_minute, length: (earlier_today - cur_minute) * 100 / day_length, occupied: true});
+        availability.push({length: (earlier_today - cur_minute) * 100 / day_length, occupied: true});
         cur_minute = earlier_today;
     } 
-    availability.push({start: cur_minute, length: (day_end - cur_minute) * 100 / day_length});
+    availability.push({length: (day_end - cur_minute) * 100 / day_length});
     return availability;
 };
 
@@ -117,6 +144,9 @@ function constructRooms() {
         floors[index].number = index + 1;
         floors[index].rooms = [];
     }
+    meetings.forEach(function(meeting) {
+        meeting.date = dateFormat(meeting.start_date, 'd mmmm') + ', ' + dateFormat(meeting.start_date, 'HH:MM') + '-' + dateFormat(meeting.end_date, 'HH:MM');
+    });
     rooms.forEach(function(room) {
         var room_meetings = meetings.filter(function(meeting) {
             return meeting.room_id == room.room_id;

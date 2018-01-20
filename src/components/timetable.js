@@ -20,6 +20,7 @@ dateFormat.i18n = {
 var day_begin = 8 * 60;
 var day_end = 23 * 60;
 var day_length = day_end - day_begin;
+var one_hour = 60;
 
 var meeting_selected = 0;
 
@@ -60,6 +61,27 @@ var rooms = [
     {name: 'Белорусский ликер', capacity: 6, room_id: 9, room_disabled: 'true', floor: 6},
 ];
 
+function feelFreeHours(cur_minute, end_minute, availability) {
+    while (cur_minute + one_hour <= end_minute) {
+        let block_end = cur_minute + one_hour;
+        availability.push({length: (block_end - cur_minute) * 100 / day_length});
+        cur_minute = block_end;
+    }
+    if (cur_minute < end_minute) {
+        availability.push({length: (end_minute - cur_minute) * 100 / day_length});
+        cur_minute = end_minute;
+    }
+    return cur_minute;
+}
+
+function feelEarlierHours(cur_minute, end_minute, availability) {
+    if (cur_minute < end_minute) {
+        availability.push({length: (end_minute - cur_minute) * 100 / day_length, occupied: true});
+        cur_minute = end_minute;
+    }
+    return cur_minute;
+}
+
 function buildMinutesAvailability(meetings) {
     meetings = meetings.sort(function(meeting1, meeting2) {
         return meeting1.start_date - meeting2.start_date;
@@ -68,27 +90,15 @@ function buildMinutesAvailability(meetings) {
     var cur_minute = day_begin;
     var earlier_today = getTime().cur_shift;
     meetings.forEach((meeting) => {
-        var meeting_start = meeting.start_date.getHours() * 60 + meeting.start_date.getMinutes();
-        console.log(meeting_start);
-        var meeting_end = meeting.end_date.getHours() * 60 + meeting.end_date.getMinutes();
-        while (cur_minute < meeting_start) {
-            if (cur_minute < earlier_today) {
-                let block_end = Math.min(meeting_start, earlier_today);
-                availability.push({length: (block_end - cur_minute) * 100 / day_length, occupied: true, meeting: meeting});
-                cur_minute = block_end;
-            } else {
-                availability.push({length: (meeting_start - cur_minute) * 100 / day_length});
-                cur_minute = meeting_start;
-            }
-        }
+        var meeting_start = meeting.start_date.getHours() * one_hour + meeting.start_date.getMinutes();
+        var meeting_end = meeting.end_date.getHours() * one_hour + meeting.end_date.getMinutes();
+        cur_minute = feelEarlierHours(cur_minute, Math.min(earlier_today, meeting_start), availability);
+        cur_minute = feelFreeHours(cur_minute, meeting_start, availability);
         availability.push({length: (meeting_end - meeting_start) * 100 / day_length, meeting_id: meeting.meeting_id, occupied: true, meeting: meeting});
         cur_minute = meeting_end;
     });
-    if (cur_minute < earlier_today) {       
-        availability.push({length: (earlier_today - cur_minute) * 100 / day_length, occupied: true});
-        cur_minute = earlier_today;
-    } 
-    availability.push({length: (day_end - cur_minute) * 100 / day_length});
+    cur_minute = feelEarlierHours(cur_minute, earlier_today, availability);
+    cur_minute = feelFreeHours(cur_minute, day_end, availability);
     return availability;
 };
 
@@ -122,7 +132,7 @@ function determineHoursState(now_hour) {
 
 function getTime() {
     let date = new Date();
-    date.setHours(date.getHours() - 7);
+    date.setHours(date.getHours() - 11);
     let hour = date.getHours();
     let minutes = date.getMinutes();
     let shift = hour * 60 + minutes;

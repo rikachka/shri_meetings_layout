@@ -28,6 +28,7 @@
 </div>
 <table class='calendar'>
 {{#each floors}}
+{{#if rooms}}
 <tr>
 <td>
 <div class='calendar-floor'>
@@ -61,6 +62,7 @@
 </td>
 </tr>
 {{/each}}
+{{/if}}
 {{/each}}
 </table>
 <style type='text/sass'>

@@ -21,6 +21,7 @@
         {{/each}}
 %table.calendar
     {{#each floors}}
+    {{#if rooms}}
     %tr
         %td
             .calendar-floor
@@ -45,6 +46,7 @@
                     {{/each}}
                 .minutes-night
     {{/each}}
+    {{/if}}
     {{/each}}
     
 

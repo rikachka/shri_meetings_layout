@@ -1,12 +1,15 @@
 .background
 .hours-blocks
-    {{#each time.blocks}}
-    .hour-block{hour: '{{ hour }}', now: '{{ now }}'}
-        {{#if now}}
-        .current-time 
-            .label {{time.now}}
-        {{/if}}
+    {{hour}}
+    {{#each time.hours}}
+    .hour-block{hour: '{{ hour }}', style: 'width: {{ time.one_hour_width }}%'}
     {{/each}}
+    {{#if time.cur_time_margin > 0}}
+    .current-time{style: 'margin-left: {{ time.cur_time_margin }}%'}
+        .line
+        .label 
+            .time {{time.cur_time_format}}
+    {{/if}}
 
 .calendar-header
     .date
@@ -17,7 +20,7 @@
             %img{src: '../images/arrow.svg'}
     #qqqq.time
         {{#each time.hours}}
-        .hour{hour_disabled: '{{ hour_disabled }}'} {{hour}}
+        .hour{hour: '{{ hour }}', hour_disabled: '{{ hour_disabled }}'} {{hour}}
         {{/each}}
 %table.calendar
     {{#each floors}}
@@ -35,16 +38,19 @@
                 .room-name {{name}}
                 .room-capacity до {{capacity}} человек
         %td
-            .room-availability  
-                .minutes-morning
-                .minutes-day
-                    {{#each availability}}
-                    .meeting{occupied: '{{ occupied }}', meeting: '{{ meeting_id }}', room: '{{ room_id }}', style: 'width: {{ length }}%'} 
+            .room-timeline  
+                .morning
+                .day
+                    {{#each timeline}}
+                    .timeline-block{occupied: '{{ occupied }}', meeting: '{{ meeting_id }}', room: '{{ room_id }}', block: '{{ block_id }}', style: 'width: {{ meeting_width }}%'} 
                         {{#if meeting_id == meeting_selected}}
                         <ComponentMeetingPopup  meeting='{{ meeting }}'></ComponentMeetingPopup>
                         {{/if}}
+                        {{#if block_id}}
+                        %img{src: '../images/add.svg'}
+                        {{/if}}
                     {{/each}}
-                .minutes-night
+                .night
     {{/each}}
     {{/if}}
     {{/each}}
@@ -80,33 +86,34 @@
             pointer-events: none;
 
             .hour-block {
-                width: 100%;
-                height: 100%;
+                height: 100% ;
+                border-right: 1px solid rgba(19,100,205,0.10);
                 
-                &[hour] {
-                    border-left: 1px solid rgba(19,100,205,0.10);
+                &:first-of-type {
+                    width: 0 !important;
                 }
+            }
+               
+            .current-time {   
+                position: absolute;
+                z-index: 11;
+                height: calc(100% + 12px);
+                top: -12px;
                 
-                &[now] {
+                .line {
                     border-left: 1px solid #007DFF;
-                    position: relative;
-                    height: calc(100% + 12px);
-                    top: -12px;
+                    height: 100% ;
                 }
                 
-                &:last-child {
-                    border-right: 1px solid rgba(19,100,205,0.10);
-                }
-                
-                .current-time {
+                .label {
                     position: absolute;
                     background: #007DFF;
                     border-radius: 100px;
                     padding: 3px 10px 4px 10px;
                     left: -26px;
                     top: calc(-20px);
-                    
-                    .label {
+
+                    .time {
                         font-family: HelveticaNeue-Bold;
                         font-size: 11px;
                         color: #FFFFFF;
@@ -235,15 +242,15 @@
                 } 
             }
             
-            .room-availability {
+            .room-timeline {
                 display: flex;
                 width: 100% ;
                 
-                .minutes-day {
+                .day {
                     display: flex;
                     width: calc(100% - 31px - 13px);
                     
-                    .meeting {
+                    .timeline-block {
                         background: #FFFFFF;
                         height: 28px;
                         position: relative;
@@ -252,23 +259,41 @@
                             background: #D5DFE9;
                         }
                         
-                        &[meeting_hover] {
+                        &[meeting]:hover {
                             background: #98A9B9;
                         }
                         
-                        &[meeting_clicked] {
+                        &[meeting][meeting_clicked] {
                             background: #8494A2;
+                        }
+                        
+                        &[block] {
+                            border-radius: 2px;
+                            
+                            &:hover {
+                                background: #1D54FE;
+                            }
+
+                            &:active {
+                                background: #1D00FE;
+                            }
+                        
+                            img {
+                                height: 12px;
+                                width: 12px;
+                                margin: calc((28px - 12px) / 2) calc((100% - 12px) / 2);
+                            }
                         }
                     }
                 }
                 
-                .minutes-morning {
+                .morning {
                     background: #D5DFE9;
                     height: 28px;
                     width: 31px;
                 }
 
-                .minutes-night {
+                .night {
                     background: #D5DFE9;
                     height: 28px;
                     width: 14px;

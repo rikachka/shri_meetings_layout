@@ -17,10 +17,10 @@ dateFormat.i18n = {
     ]
 };
 
-var day_begin = 8 * 60;
-var day_end = 23 * 60;
-var day_length = day_end - day_begin;
 var one_hour = 60;
+var day_begin = 8 * one_hour;
+var day_end = 23 * one_hour;
+var day_length = day_end - day_begin;
 
 var meeting_selected = 0;
 
@@ -61,70 +61,62 @@ var rooms = [
     {name: 'Белорусский ликер', capacity: 6, room_id: 9, room_disabled: 'true', floor: 6},
 ];
 
-function feelFreeHours(cur_minute, end_minute, availability) {
-    while (cur_minute + one_hour <= end_minute) {
-        let block_end = cur_minute + one_hour;
-        availability.push({length: (block_end - cur_minute) * 100 / day_length});
+function feelFreeHours(cur_minute, end_minute, timeline, block_id) {
+    let block_end = Math.floor(cur_minute / one_hour) * one_hour + one_hour;
+    while (block_end <= end_minute) {
+        block_id++;
+        timeline.push({meeting_width: (block_end - cur_minute) * 100 / day_length, block_id: block_id});
         cur_minute = block_end;
+        block_end = cur_minute + one_hour;
     }
     if (cur_minute < end_minute) {
-        availability.push({length: (end_minute - cur_minute) * 100 / day_length});
+        block_id++;
+        timeline.push({meeting_width: (end_minute - cur_minute) * 100 / day_length, block_id: block_id});
+        cur_minute = end_minute;
+    }
+    return {
+        cur_minute: cur_minute, 
+        block_id: block_id
+    };
+}
+
+function feelEarlierHours(cur_minute, end_minute, timeline) {
+    if (cur_minute < end_minute) {
+        timeline.push({meeting_width: (end_minute - cur_minute) * 100 / day_length, occupied: true});
         cur_minute = end_minute;
     }
     return cur_minute;
 }
 
-function feelEarlierHours(cur_minute, end_minute, availability) {
-    if (cur_minute < end_minute) {
-        availability.push({length: (end_minute - cur_minute) * 100 / day_length, occupied: true});
-        cur_minute = end_minute;
-    }
-    return cur_minute;
-}
-
-function buildMinutesAvailability(meetings) {
+function buildTimeline(meetings) {
     meetings = meetings.sort(function(meeting1, meeting2) {
         return meeting1.start_date - meeting2.start_date;
     });
-    var availability = [];
+    var timeline = [];
     var cur_minute = day_begin;
-    var earlier_today = getTime().cur_shift;
+    var earlier_today = getTime().cur_time;
+    var block_id = 0;
     meetings.forEach((meeting) => {
         var meeting_start = meeting.start_date.getHours() * one_hour + meeting.start_date.getMinutes();
         var meeting_end = meeting.end_date.getHours() * one_hour + meeting.end_date.getMinutes();
-        cur_minute = feelEarlierHours(cur_minute, Math.min(earlier_today, meeting_start), availability);
-        cur_minute = feelFreeHours(cur_minute, meeting_start, availability);
-        availability.push({length: (meeting_end - meeting_start) * 100 / day_length, meeting_id: meeting.meeting_id, occupied: true, meeting: meeting});
+        cur_minute = feelEarlierHours(cur_minute, Math.min(earlier_today, meeting_start), timeline);
+        ({ cur_minute, block_id } = feelFreeHours(cur_minute, meeting_start, timeline, block_id));
+        timeline.push({meeting_width: (meeting_end - meeting_start) * 100 / day_length, meeting_id: meeting.meeting_id, occupied: true, meeting: meeting});
         cur_minute = meeting_end;
     });
-    cur_minute = feelEarlierHours(cur_minute, earlier_today, availability);
-    cur_minute = feelFreeHours(cur_minute, day_end, availability);
-    return availability;
+    cur_minute = feelEarlierHours(cur_minute, earlier_today, timeline);
+    ({ cur_minute, block_id } = feelFreeHours(cur_minute, day_end, timeline, block_id));
+    return timeline;
 };
 
-function buildMinutesBlocks(now_block) {
-    now_block = Math.floor((now_block - day_begin) / 5);
-    var blocks = [];
-    var cur_minute = 0;
-    for(; cur_minute < 180; cur_minute++) {
-        if (cur_minute == now_block) {
-            blocks.push({minute: cur_minute, now: true});
-        } else if (cur_minute % 12 == 0) {
-            blocks.push({minute: cur_minute, hour: true});
-        } else {
-            blocks.push({minute: cur_minute})
-        }
-    }
-    return blocks;
-};
-
-function determineHoursState(now_hour) {
+function determineHoursState(now_time) {
     var hours = []
-    for(let hour = 8; hour < 24; hour++) {
-        if (hour <= now_hour) {
-            hours.push({hour: hour, hour_disabled: true});
+    for(let cur_time = day_begin; cur_time <= day_end; cur_time += one_hour) {
+        let cur_hour = + Math.round(cur_time / one_hour)
+        if (cur_time <= now_time) {
+            hours.push({hour: cur_hour, hour_disabled: true});
         } else {
-            hours.push({hour: hour});
+            hours.push({hour: cur_hour});
         }
     }
     return hours;
@@ -132,18 +124,19 @@ function determineHoursState(now_hour) {
 
 function getTime() {
     let date = new Date();
-    date.setHours(date.getHours() - 11);
-    let hour = date.getHours();
-    let minutes = date.getMinutes();
-    let shift = hour * 60 + minutes;
-    let time = dateFormat(date, 'HH:MM');
+    date.setHours(date.getHours() + 10);
+    let cur_hour = date.getHours();
+    let cur_minutes = date.getMinutes();
+    let cur_time = cur_hour * one_hour + cur_minutes;
+    let cur_time_format = dateFormat(date, 'HH:MM');
     return {
-        now: time, 
-        cur_hour: hour,
-        cur_minutes: minutes,
-        cur_shift: shift,
-        blocks: buildMinutesBlocks(shift),
-        hours: determineHoursState(hour),
+        cur_time_format: cur_time_format, 
+        cur_hour: cur_hour,
+        cur_minutes: cur_minutes,
+        cur_time: cur_time,
+        one_hour_width: one_hour * 100 / day_length,
+        hours: determineHoursState(cur_time),
+        cur_time_margin: (cur_time - day_begin) * 100 / day_length,
     };
 }
 
@@ -161,7 +154,7 @@ function constructRooms() {
         var room_meetings = meetings.filter(function(meeting) {
             return meeting.room_id == room.room_id;
         });
-        room.availability = buildMinutesAvailability(room_meetings);
+        room.timeline = buildTimeline(room_meetings);
         floors[room.floor - 1].rooms.push(room);
     });
     return floors.reverse();
@@ -181,34 +174,22 @@ export default Ractive.extend({
         time: getTime,
     },
     oncomplete: function() {
-    	$('.meeting').click((item) => {
+    	$('.timeline-block[occupied]').click((item) => {
             if (item.target.attributes.meeting) {
                 let meeting_id = item.target.attributes.meeting.value;
                 let room_id = item.target.attributes.room.value;
                 if (item.target.attributes.meeting_clicked) {
                     this.set('meeting_selected', 0);
-                    $('.meeting[meeting="' + meeting_id + '"]').removeAttr('meeting_clicked');
+                    $('.timeline-block[meeting="' + meeting_id + '"]').removeAttr('meeting_clicked');
                     $('.calendar-rooms[room="' + room_id + '"]').children('.room-name').removeAttr('room_clicked');
                 } else {
                     this.set('meeting_selected', meeting_id);
-                    $('.meeting[meeting!="' + meeting_id + '"]').removeAttr('meeting_clicked');
-                    $('.meeting[meeting="' + meeting_id + '"]').attr('meeting_clicked', true);
+                    $('.timeline-block[meeting!="' + meeting_id + '"]').removeAttr('meeting_clicked');
+                    $('.timeline-block[meeting="' + meeting_id + '"]').attr('meeting_clicked', true);
                     $('.calendar-rooms[room!="' + room_id + '"]').children('.room-name').removeAttr('room_clicked');
                     $('.calendar-rooms[room="' + room_id + '"]').children('.room-name').attr('room_clicked', 'true');
                 }
             }
     	});
-        
-    	$('.meeting').hover((item) => {
-            if (item.target.attributes.meeting) {
-                let meeting_id = item.target.attributes.meeting.value;
-                $('.meeting[meeting="' + meeting_id + '"]').attr('meeting_hover', true);
-                let room_id = item.target.attributes.room.value;
-                $('.calendar-rooms[room="' + room_id + '"]').children('.room-name').attr('room_hover', 'true');
-            }
-    	}, () => {
-            $('.meeting').removeAttr('meeting_hover');
-            $('.calendar-rooms').children('.room-name').removeAttr('room_hover');
-        });
     }
 });

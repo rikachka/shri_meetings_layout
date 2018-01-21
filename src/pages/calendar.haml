@@ -1,6 +1,10 @@
 %body
     <ComponentHeader></ComponentHeader>
+    {{#if page == 'timetable'}}
     <ComponentTimetable></ComponentTimetable>
+    {{elseif page == 'meeting'}}
+    <ComponentMeeting></ComponentMeeting>
+    {{/if}}
   
 :plain
     <style type='text/sass'>  
